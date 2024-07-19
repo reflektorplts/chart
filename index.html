@@ -20,8 +20,8 @@
 
       function updateData() {
         fetch('https://script.google.com/macros/s/AKfycbwDylISZy9gCxo1i_lypGrkmLE3riJppvTAcELiZazv5qqiUkuVwh1VgHsemkpgSxr0/exec')
-          .then(response => response.json())
-          .then(data => {
+         .then(response => response.json())
+         .then(data => {
             const chartData1 = {
               labels: data.map(row => row['Timestamp']),
               datasets: [{
@@ -83,56 +83,65 @@
             };
             
             if (chart1) {
-              chart1.destroy();
+              chart1.data.labels = chartData1.labels;
+              chart1.data.datasets.forEach((dataset, index) => {
+                dataset.data = chartData1.datasets[index].data;
+              });
+              chart1.update();
+            } else {
+              const ctx1 = document.getElementById('chart1').getContext('2d');
+              chart1 = new Chart(ctx1, {
+                type: 'line',
+                data: chartData1,
+                options: {
+                  title: {
+                    display: true,
+                    text: 'AC Data'
+                  },
+                  scales: {
+                    yAxes: [{
+                      ticks: {
+                        beginAtZero: true
+                      }
+                    }]
+                  }
+                }
+              });
             }
+            
             if (chart2) {
-              chart2.destroy();
+              chart2.data.labels = chartData2.labels;
+              chart2.data.datasets.forEach((dataset, index) => {
+                dataset.data = chartData2.datasets[index].data;
+              });
+              chart2.update();
+            } else {
+              const ctx2 = document.getElementById('chart2').getContext('2d');
+              chart2 = new Chart(ctx2, {
+                type: 'line',
+                data: chartData2,
+                options: {
+                  title: {
+                    display: true,
+                    text: 'DC Data'
+                  },
+                  scales: {
+                    yAxes: [{
+                      ticks: {
+                        beginAtZero: true
+                      }
+                    }]
+                  }
+                }
+              });
             }
-            
-            const ctx1 = document.getElementById('chart1').getContext('2d');
-            chart1 = new Chart(ctx1, {
-              type: 'line',
-              data: chartData1,
-              options: {
-                title: {
-                  display: true,
-                  text: 'AC Data'
-                },
-                scales: {
-                  yAxes: [{
-                    ticks: {
-                      beginAtZero: true
-                    }
-                  }]
-                }
-              }
-            });
-            
-            const ctx2 = document.getElementById('chart2').getContext('2d');
-            chart2 = new Chart(ctx2, {
-              type: 'line',
-              data: chartData2,
-              options: {
-                title: {
-                  display: true,
-                  text: 'DC Data'
-                },
-                scales: {
-                  yAxes: [{
-                    ticks: {
-                      beginAtZero: true
-                    }
-                  }]
-                }
-              }
-            });
           })
-          .catch(error => console.error('Error:', error));
+         .catch(error => console.error('Error:', error));
       }
-      
-      // Update data every x second
-      setInterval(updateData, 10000);
-      
+
+      // Update data every 1 second
+      setInterval(updateData, 3000);
+
       // Initial update
       updateData();
     </script>
